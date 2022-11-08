@@ -13,6 +13,11 @@ const user_get=(req, res) => {
     res.json(users.filter(user => user.id==req.params.id));
 };
 
+const user_post=(req, res, next) => {
+    console.log(req.body)
+    res.json(req.body)
+}
+
 module.exports={
-    user_list_get, user_get
+    user_list_get, user_get, user_post
 };
