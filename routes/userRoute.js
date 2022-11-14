@@ -1,23 +1,26 @@
 
 'use strict';
 const express=require('express');
-const router=express.Router()
+const router=express.Router();
+const { body, validationResult }=require('express-validator')
+
 
 const userController=require('../controllers/userController');
 
-// TODO: chain the router method calls
 router.get('/', userController.getUsers);
 
 router.get('/:userId', userController.getUser);
 
-router.post('/', userController.createUser);
+router.post('/',
+    body('email').isEmail().normalizeEmail(),
+    body('name').notEmpty().isLength({ min: 3 }).trim().escape(),
+    body('passwd').isLength({ min: 8 }).matches(/[A-Z]/),
+    userController.createUser);
 
 router.put('/', (req, res) => {
     res.send('From this endpoint you can edit users.');
-    // TODO: replace with controller & data model
 });
 router.delete('/', (req, res) => {
-    // TODO: replace with controller & data model 
     res.send('From this endpoint you can delete users.');
 });
 
