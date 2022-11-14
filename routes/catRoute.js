@@ -4,14 +4,31 @@ const express=require('express');
 const router=express.Router()
 const multer=require('multer');
 const catController=require('../controllers/catController');
+const { body, validationResult }=require('express-validator')
 
 const upload=multer({ dest: 'uploads/' });
 
 router.get('/', catController.getCats)
-    .get('/:catId', catController.getCat)
-    .post('/', upload.single('cat'), catController.createCat)
-    .put('/', catController.modifyCat)
-    .put('/:catId', catController.modifyCat)
-    .delete('/:catId', catController.deleteCat);
+
+router.get('/:catId', catController.getCat)
+
+router.post('/',
+    upload.single('cat'),
+    body('name').notEmpty,
+    body('Birthdate').isDate().notEmpty(),
+    body('weight').isNumeric().notEmpty(),
+    body('owner').notEmpty(),
+    catController.createCat)
+
+router.put('/',
+    body('name').notEmpty,
+    body('Birthdate').isDate().notEmpty(),
+    body('weight').isNumeric().notEmpty(),
+    body('owner').notEmpty(),
+    catController.modifyCat)
+
+router.put('/:catId', catController.modifyCat)
+
+router.delete('/:catId', catController.deleteCat);
 
 module.exports=router;
