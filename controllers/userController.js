@@ -1,4 +1,5 @@
 'use strict';
+const { validationResult }=require('express-validator');
 const userModel=require('../models/userModel');
 
 const getUsers=async (req, res) => {
@@ -17,10 +18,16 @@ const getUser=async (req, res) => {
 };
 
 const createUser=async (req, res) => {
-    console.log('Creating a new user:', req.body);
-    const newUser=req.body;
-    const result=await userModel.addUser(newUser, res);
-    res.status(201).json({ userId: result });
+    const error=validationResult(req);
+    console.log(error);
+    if (!error.isEmpty()) {
+        res.status(400).json({ error: error.array() });
+    } else {
+        console.log('Creating a new user:', req.body);
+        const newUser=req.body;
+        const result=await userModel.addUser(newUser, res);
+        res.status(201).json({ userId: result });
+    }
 };
 
 const modifyUser=(req, res) => {

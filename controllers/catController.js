@@ -1,4 +1,5 @@
 'use strict';
+const { validationResult }=require('express-validator');
 const { rawListeners }=require('../database/db');
 const catModel=require('../models/catModel');
 
@@ -18,23 +19,34 @@ const getCat=async (req, res) => {
 };
 
 const createCat=async (req, res) => {
-    const cat=req.body;
-    cat.filename=req.file.filename;
-    console.log('creating a new cat:', cat);
-    const catId=await catModel.addCat(cat, res);
-    res.status(201).json({ catId });
+    const error=validationResult(req);
+    console.log(error);
+    if (!error.isEmpty()) {
+        res.status(400).json({ error: error.array() });
+    } else {
+        const cat=req.body;
+        cat.filename=req.file.filename;
+        console.log('creating a new cat:', cat);
+        const catId=await catModel.addCat(cat, res);
+        res.status(201).json({ catId });
+    }
 };
 
 const modifyCat=async (req, res) => {
     const cat=req.body;
-    if (req.params.catId) {
-        cat.id=req.params.catId;
-    }
-    const result=await catModel.updateCatById(cat, res);
-    if (result.affectedRows>0) {
-        res.json({ message: 'cat modified: '+cat.id });
+    const error=validationResult(req);
+    if (!error.isEmpty()) {
+        res.status(400).json({ error: error.array() });
     } else {
-        res.status(404).json({ message: 'nothing changed' });
+        if (req.params.catId) {
+            cat.id=req.params.catId;
+        }
+        const result=await catModel.updateCatById(cat, res);
+        if (result.affectedRows>0) {
+            res.json({ message: 'cat modified: '+cat.id });
+        } else {
+            res.status(404).json({ message: 'nothing changed' });
+        }
     }
 };
 
