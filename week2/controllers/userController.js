@@ -18,6 +18,10 @@ const user_post=(req, res, next) => {
     res.json(req.body)
 }
 
+const checkToken=(req, res) => {
+    res.json({ user: req.user });
+};
+
 module.exports={
     user_list_get, user_get, user_post
 };
